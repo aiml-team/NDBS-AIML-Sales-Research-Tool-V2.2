@@ -1,0 +1,435 @@
+/* Global */
+body {
+  margin: 0;
+  font-family: "Segoe UI", sans-serif;
+  background-color: #0c1c33;
+  /* color: #000000; */
+  height: 100vh;
+  overflow: hidden;
+}
+
+a {
+  text-decoration: none;
+  color: #00bfff;
+}
+
+/* Layout */
+.app-container {
+  display: flex;
+  height: 100vh;
+  flex-direction: row;
+  overflow: hidden;
+  border-radius: 15px;
+}
+
+.sidebar {
+  width: 280px;
+  background-color: #194072;
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  color: #ffffff;
+  border-radius: 15px;
+  border-right: #000000;
+  flex-shrink: 0; /* Add this line to prevent shrinking */
+}
+.logo {
+  width: 200px;
+  align-items: left;
+  margin-bottom: 20px;
+}
+
+/* Hamburger Menu */
+.hamburger-toggle {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  align-self: flex-start;
+}
+
+.hamburger-menu {
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.hamburger-menu.active {
+  display: flex;
+}
+
+.hamburger-menu .version-box {
+  background: #102d4e;
+  padding: 15px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sidebar h2 {
+  font-size: 20px;
+  margin-bottom: 5px;
+}
+
+.note {
+  font-size: 13px;
+  color: #ccc;
+  margin-bottom: 10px;
+}
+
+.status-message {
+  margin-top: 20px;
+  font-size: 16px;
+  color: #070606;
+  font-style: italic;
+}
+
+/* Search History  */
+/* .search-history-list {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 10px;
+}
+
+.search-history-list li {
+  margin-bottom: 6px;
+}
+
+.history-btn {
+  background: none;
+  border: none;
+  color: #00BFFF;
+  font-size: 15px;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+}
+
+.history-btn:hover {
+  text-decoration: underline;
+} */
+
+.history-btn {
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: 15px;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+}
+
+.history-placeholder {
+    color: #999;
+    font-size: 14px;
+    padding: 8px;
+    border: 1px dashed #556;
+    margin-bottom: 20px;
+}
+
+.primary-btn {
+  background-color: #133168;
+  border: none;
+  color: #00BFFF;
+  padding: 20px;
+  width: 100%;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-bottom: 30px;
+}
+
+.version-box {
+  background: #102d4e;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: auto;
+}
+
+.version-label {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.version-box button {
+  background: #19569c;
+  color: white;
+  border: none;
+  padding: 8px;
+  margin-bottom: 8px;
+  width: 100%;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Main content */
+.main-content {
+  flex-grow: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  overflow-y: auto;
+  /* height: calc(100vh - 70px); */
+  color: #000000;
+  padding-bottom: 200px;
+  border-radius: 15px;
+}
+
+.main-content h1 {
+  font-size: 34px;
+  margin-bottom: 10px;
+}
+
+.subnote {
+  font-size: 16px;
+  color: #010000;
+}
+
+hr {
+  margin: 30px 0;
+  border: 0;
+  border-top: 1px solid #444;
+}
+
+/* Search Mode Toggle Container */
+.search-mode-container {
+  position: fixed;
+  top: 20px;
+  right: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  z-index: 5;
+}
+
+.search-toggle-wrapper {
+  margin-bottom: 10px;
+}
+
+/* Search Toggle Switch */
+.search-toggle {
+  position: relative;
+  width: 240px;
+  height: 45px;
+  background: #f0f0f0;
+  border-radius: 25px;
+  cursor: pointer;
+  border: 2px solid #194072;
+  overflow: hidden;
+  user-select: none;
+}
+
+.toggle-slider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(135deg, #194072 0%, #007bff 100%);
+  border-radius: 25px;
+  transition: transform 0.3s ease;
+  z-index: 1;
+}
+
+.toggle-option {
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  transition: color 0.3s ease;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.toggle-option.left {
+  left: 0;
+}
+
+.toggle-option.right {
+  right: 0;
+}
+
+.toggle-option.active {
+  color: #ffffff;
+}
+
+.toggle-option:not(.active) {
+  color: #333;
+}
+
+/* Coming Soon Message */
+.coming-soon-message {
+  display: none;
+  font-size: 14px;
+  color: #666;
+  font-style: italic;
+  margin-top: 5px;
+  margin-right: 10px;
+}
+
+.info-box {
+  background: #faf6d7;
+  padding: 20px;
+  border-radius: 15px;
+  margin-top: 10px; /* Increased margin to account for toggle */
+  font-size: 16px;
+  color: #000000;
+  border-top: 5px solid #f3cd70;
+  border-left: 5px solid #f3cd70;
+  border-right: 5px solid #f3cd70;
+  border-bottom: 5px solid #f3cd70;
+}
+
+.info-box ul {
+  margin-top: 10px;
+  padding-left: 20px;
+}
+
+.preview-box {
+  background-color: #194072;
+  color: #fff;
+  padding: 25px 35px;
+  border-radius: 10px;
+  margin: 20px 0 30px 0;
+  font-size: 16px;
+  line-height: 1.8;
+  white-space: normal;
+}
+
+.preview-box h2 {
+  margin-bottom: 20px;
+  font-size: 22px;
+  color: #fff;
+  border-bottom: 1px solid #444;
+  padding-bottom: 10px;
+}
+
+.preview-box ul {
+  padding-left: 20px;
+  margin-top: 10px;
+  list-style-type: disc;
+}
+
+.preview-box li {
+  margin-bottom: 8px;
+}
+
+.download-link {
+  margin-top: 10px;
+  background: #008000;
+  color: #ffffff;
+  padding: 12px 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+  font-weight: bold;
+  width: 200px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+/* Bottom search */
+.bottom-search {
+  position: fixed;
+  bottom: 0;
+  left: 320px; /* align with sidebar width */
+  right: 0;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px 30px;
+  border-top: 1px solid #333;
+  border-left: 1px solid #333;
+  z-index: 10;
+  border-radius: 15px;
+}
+
+.bottom-search form {
+  display: flex;
+  align-items: center;
+  max-width: 1000px;
+  width: 100%;
+} 
+
+.bottom-search input {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  background: #ffffff;
+  color: #000000;
+  margin-right: 15px;
+  border: 1px solid #444;
+}
+
+.bottom-search button {
+  background: #007bff;
+  color: white;
+  border: none;
+  font-size: 18px;
+  padding: 12px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+#downloadBtn {
+  background: #28a745;   /* green */
+  color: white !important;
+  border: none;
+  font-size: 18px;
+  padding: 12px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-block;
+  text-decoration: none;
+  text-align: center;
+
+  /* match button box model */
+  height: 42px;            /* Research = 18px font + 12px top + 12px bottom */
+  line-height: 18px;       /* keeps text vertically aligned */
+  box-sizing: border-box;
+  min-width: 120px;   
+}
+
+#downloadBtn:hover {
+  background: #218838; /* darker green hover */
+}
+
+/* Responsive Design for Toggle */
+@media (max-width: 768px) {
+  .search-mode-container {
+    position: static;
+    align-items: center;
+    margin: 20px 0;
+  }
+  
+  .search-toggle {
+    width: 200px;
+    height: 40px;
+  }
+  
+  .toggle-option {
+    font-size: 16px;
+  }
+  
+  .info-box {
+    margin-top: 20px;
+  }
+}

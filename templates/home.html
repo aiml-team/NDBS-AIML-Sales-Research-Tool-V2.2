@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AI Sales Research</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <img src="{{ url_for('static', filename='Logo-White.png') }}" alt="NTT Logo" class="logo">
+
+      <!-- Hamburger Toggle -->
+      <button class="hamburger-toggle" id="hamburgerBtn">☰</button>
+
+      <!-- Hidden Hamburger Menu -->
+      <div class="hamburger-menu" id="menu">
+        <div class="version-box">
+        <div style="font-weight: 700; color: white; font-size: 20px; margin-bottom: 15px;">Version: 1.0.0</div>
+            <a href="https://itellicloud.sharepoint.com/:b:/r/sites/US-saleshub/Shared%20Documents/06-%20Digital%20Innovations%20Internal%20Documents/Artificial%20Intelligence%20and%20Machine%20Learning%20Projects/2025%20-%20AI%20Sales%20Research/AI%20Sales%20Research%20v1.0.0/PDF/Release%20Document%20-%20AI%20Sales%20Research%20v1.0.0.pdf?csf=1&web=1&e=DoAben" target="_blank" style="display: block; text-align: center; padding: 14px; margin-bottom: 12px; background-color: #133168; border-radius: 8px; color: #00BFFF; text-decoration: none; font-size: 16px; font-weight: 600;">Release Document</a>
+            <a href="https://itellicloud.sharepoint.com/:b:/r/sites/US-saleshub/Shared%20Documents/06-%20Digital%20Innovations%20Internal%20Documents/Artificial%20Intelligence%20and%20Machine%20Learning%20Projects/2025%20-%20AI%20Sales%20Research/AI%20Sales%20Research%20v1.0.0/PDF/AI%20Sales%20Research%20-%20User%20Manual.pdf?csf=1&web=1&e=OluGWH" target="_blank" style="display: block; text-align: center; padding: 14px; margin-bottom: 12px; background-color: #133168; border-radius: 8px; color: #00BFFF; text-decoration: none; font-size: 16px; font-weight: 600;">User Manual</a>
+            <a href="https://forms.office.com/Pages/ShareFormPage.aspx?id=Gd7ERvwPVEyqhu5ydK-p1ypLotnXSFBLsOBkdbM0WSpUMFc3WlVGSUQ4UkJSNE1EWENGRjRJUEVXSC4u&sharetoken=7W58uO1Lp7fgsIfeJmGA" target="_blank" style="display: block; text-align: center; padding: 14px; background-color: #133168; border-radius: 8px; color: #00BFFF; text-decoration: none; font-size: 16px; font-weight: 600;">Feedback Form</a>
+        </div>
+      </div>
+
+      <h2>Search History</h2>
+      <p class="note">Click a company to reload report:</p>
+      <div class="history-placeholder">No options to select.</div>
+
+      <form method="GET" action="/">
+        <button type="submit" class="primary-btn">New Research</button>
+      </form>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <h1>AI Sales Research</h1>
+      <p class="subnote">ℹ️ Enter a company name to fetch insights and generate a structured summary.</p>
+      <hr>
+
+      <!-- Search Mode Toggle -->
+      <div class="search-mode-container">
+        <div class="search-toggle-wrapper">
+          <div class="search-toggle" id="searchToggle">
+            <div class="toggle-slider" id="toggleSlider"></div>
+            <span class="toggle-option left active" id="quickOption">Quick Search</span>
+            <span class="toggle-option right" id="deepOption">Deep Search</span>
+          </div>
+        </div>
+        <div class="coming-soon-message" id="comingSoonMessage">
+          <em>Coming Soon..</em>
+        </div>
+      </div>
+
+      <div class="info-box">
+        <p><strong>Important Note:</strong></p>
+        <ul>
+          <li>This is <em>AI-generated</em> content. No warranty is made as to its accuracy, completeness, or suitability for any specific purpose.</li>
+        </ul>
+      </div>
+
+      <!-- Generating Pop-up -->
+      <div class="status-message" id="statusMessage" style="display: none;">
+        ⏳ Generating...
+      </div>
+      {% if file_ready %}
+      <div class="preview-box">
+        <h2>Generated Company Report</h2>
+        <div class="formatted-report">{{ generated_report | safe }}</div>
+      </div>
+
+<div class="report-actions">
+    <a href="{{ url_for('download_report') }}" class="download-link">
+        <i class="fas fa-download"></i> Download Word Doc
+    </a>
+</div>
+      {% endif %}
+
+      <!-- Error message -->
+      {% if error %}
+        <p style="color: red; margin-top: 20px;">{{ error }}</p>
+      {% endif %}
+    </main>
+
+    <!-- Search Bar -->
+    <form method="POST" class="bottom-search">
+      <input type="text" name="company" placeholder="Enter a company name (Ex. Apple)..." required>
+      <!-- <button type="submit">➔</button> -->
+      <button type="submit">Research</button>
+    </form>
+  </div>
+
+  <!-- JavaScript toggle -->
+  <!-- Hamburger menu toggle -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const toggleBtn = document.getElementById("hamburgerBtn");
+      const menu = document.getElementById("menu");
+      const searchToggle = document.getElementById("searchToggle");
+      const toggleSlider = document.getElementById("toggleSlider");
+      const quickOption = document.getElementById("quickOption");
+      const deepOption = document.getElementById("deepOption");
+      const comingSoonMessage = document.getElementById("comingSoonMessage");
+      
+      // Hamburger menu toggle
+      toggleBtn.addEventListener("click", () => {
+        menu.classList.toggle("active");
+      });
+
+      // Search mode toggle
+      searchToggle.addEventListener("click", function() {
+        const isQuickActive = quickOption.classList.contains("active");
+        
+        if (isQuickActive) {
+          // Switch to Deep Search
+          toggleSlider.style.transform = "translateX(100%)";
+          quickOption.classList.remove("active");
+          deepOption.classList.add("active");
+          comingSoonMessage.style.display = "block";
+        } else {
+          // Switch to Quick Search
+          toggleSlider.style.transform = "translateX(0%)";
+          deepOption.classList.remove("active");
+          quickOption.classList.add("active");
+          comingSoonMessage.style.display = "none";
+        }
+      });
+  
+      // Show status message on form submit
+      const form = document.querySelector(".bottom-search");
+      const status = document.getElementById("statusMessage");
+  
+      form.addEventListener("submit", function () {
+        status.style.display = "block";
+        status.textContent = "⏳ Generating...";
+      });
+    }); 
+  </script>
+</body>
+</html>

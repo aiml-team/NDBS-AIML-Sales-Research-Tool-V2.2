@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AI Sales Research</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='test.css') }}">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <img src="{{ url_for('static', filename='Logo-White.png') }}" alt="NTT Logo" class="logo">
+
+      <!-- Hamburger Toggle -->
+      <button class="hamburger-toggle" id="hamburgerBtn">☰</button>
+
+      <!-- Hidden Hamburger Menu -->
+      <div class="hamburger-menu" id="menu">
+        <div class="version-box">
+          <div style="font-weight: 700; color: white; font-size: 20px; margin-bottom: 15px;">Version: 2.2.0</div>
+          <a href="https://itellicloud.sharepoint.com/:b:/r/sites/US-saleshub/Shared%20Documents/06-%20Digital%20Innovations%20Internal%20Documents/Artificial%20Intelligence%20and%20Machine%20Learning%20Projects/2025%20-%20AI%20Sales%20Research/AI%20Sales%20Research%20v2.0.0/AI%20Sales%20Research%20v2.2.0/PDF%20v2.2/Release%20Document%20-%20AI%20Sales%20Research%20v2.2.0.pdf?csf=1&web=1&e=JKtAPh" target="_blank" class="sidebar-link">Release Document</a>
+          <a href="https://itellicloud.sharepoint.com/:b:/r/sites/US-saleshub/Shared%20Documents/06-%20Digital%20Innovations%20Internal%20Documents/Artificial%20Intelligence%20and%20Machine%20Learning%20Projects/2025%20-%20AI%20Sales%20Research/AI%20Sales%20Research%20v2.0.0/AI%20Sales%20Research%20v2.2.0/PDF%20v2.2/AI%20Sales%20Research%20v2.2%20-%20User%20Manual.pdf?csf=1&web=1&e=jyCP4s" target="_blank" class="sidebar-link">User Manual</a>
+          <a href="https://forms.office.com/Pages/ShareFormPage.aspx?id=Gd7ERvwPVEyqhu5ydK-p1ypLotnXSFBLsOBkdbM0WSpUMFc3WlVGSUQ4UkJSNE1EWENGRjRJUEVXSC4u&sharetoken=7W58uO1Lp7fgsIfeJmGA" target="_blank" class="sidebar-link">Feedback Form</a>
+        </div>
+      </div>
+
+      <h2>Search History</h2>
+      <p class="note">Click a company to reload report:</p>
+
+      {% if history and history|length > 0 %}
+      <ul class="search-history-list">
+        {% for item in history %}
+      <li>
+        <!-- <a href="{{ url_for('load_history', idx=loop.index0) }}" class="history-btn">
+            {{ item.company }}
+            <span class="timestamp">({{ item.timestamp }})</span>
+        </a> -->
+        <a href="{{ url_for('load_history', idx=loop.index0) }}" class="history-btn">
+          {{ item.company }}
+          <span class="timestamp">{{ item.search_mode }} - ({{ item.timestamp }})</span>
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <div class="history-placeholder">No options to select.</div>
+    {% endif %}
+
+      <!-- <form method="GET" action="/">
+        <button type="submit" class="primary-btn">New Research</button>
+      </form> -->
+      <form method="GET" action="/?new=true">
+        <button type="button" class="primary-btn" onclick="window.location.href='/?new=true'">New Research</button>
+      </form>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <h1>AI Sales Research</h1>
+      <p class="subnote">ℹ️ Choose your search mode and enter a company name to generate insights.</p>
+      <hr>
+
+      <!-- Search Mode Toggle - ENHANCED -->
+      <div class="search-mode-container">
+        <div class="search-toggle-wrapper">
+          <div class="search-toggle" id="searchToggle">
+            <div class="toggle-slider" id="toggleSlider"></div>
+            <span class="toggle-option left active" id="quickOption">Quick Search</span>
+            <span class="toggle-option right" id="deepOption">Deep Search</span>
+          </div>
+        </div>
+        <!-- <div class="coming-soon-message" id="modeDescription">
+          <strong>Quick Search:</strong> Generates a 6-7 page report with essential business intelligence (Fast)
+        </div> -->
+      </div>
+
+      <div class="info-box">
+        <p><strong>Important Note:</strong></p>
+        <ul>
+          <li>This is <strong><em>AI-generated</em></strong> content. No warranty is made as to its accuracy, completeness, or suitability for any specific purpose.</li>
+          <li><strong>Quick Search (Default):</strong> Fast, focused analysis for initial research and quick insights.</li>
+          <li><strong>Deep Search:</strong> Exhaustive, comprehensive analysis with detailed insights for strategic planning.</li>
+        </ul>
+      </div>
+
+      <!-- Generating Pop-up -->
+      <div class="status-message" id="statusMessage" style="display: none;">
+        ⏳ Generating...
+      </div>
+
+      {% if file_ready %}
+      <div class="preview-box">
+        <h2>{{ company }} Research Report</h2>
+        <div class="formatted-report">{{ generated_report | safe }}</div>
+      </div>
+      {% endif %}
+
+      {% if error %}
+        <p style="color: red; margin-top: 20px; padding: 15px; background: #fee; border-radius: 5px; border-left: 4px solid red;">
+          <strong>Error:</strong> {{ error }}
+        </p>
+      {% endif %}
+    </main>
+
+    <!-- Search Bar -->
+    <form method="POST" action="/" class="bottom-search" id="searchForm">
+      <!-- Hidden field for mode -->
+      <input type="hidden" name="search_mode" id="searchModeInput" value="Quick Search">
+
+      <input type="text" name="company" placeholder="Enter a company name (Ex. Apple, Microsoft, Tesla)..." required>
+
+      <button type="submit" id="researchBtn" class="action-btn action-primary">Research</button>
+
+      {% if file_ready %}
+      <a href="{{ url_for('download_report', idx=0) }}" id="downloadBtn" class="action-btn action-download">
+        📥 Download
+      </a>
+      {% endif %}
+    </form>
+  </div>
+
+  <!-- JavaScript -->
+  <!-- <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const hamburgerBtn = document.getElementById("hamburgerBtn");
+      const menu = document.getElementById("menu");
+
+      const toggleSlider = document.getElementById("toggleSlider");
+      const quickOption = document.getElementById("quickOption");
+      const deepOption = document.getElementById("deepOption");
+      const searchModeInput = document.getElementById("searchModeInput");
+      const modeDescription = document.getElementById("modeDescription");
+      const researchBtn = document.getElementById("researchBtn");
+      const searchToggle = document.getElementById("searchToggle");
+      const form = document.getElementById("searchForm");
+      const statusMessage = document.getElementById("statusMessage");
+
+      let mode = "Quick Search";
+      searchModeInput.value = mode;
+
+      // Hamburger menu toggle
+      hamburgerBtn.addEventListener("click", () => {
+        menu.classList.toggle("active");
+      });
+
+      // Toggle logic - MUTUALLY EXCLUSIVE
+      searchToggle.addEventListener("click", function (e) {
+        e.preventDefault();
+        
+        if (mode === "Quick Search") {
+          // Switch to Deep Search
+          mode = "Deep Search";
+          toggleSlider.style.transform = "translateX(100%)";
+          // toggleSlider.style.background = "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)";
+          quickOption.classList.remove("active");
+          deepOption.classList.add("active");
+          modeDescription.innerHTML = "<strong>Deep Search:</strong> Generates a comprehensive report with exhaustive analysis and citations";
+          // modeDescription.style.background = "rgba(240, 147, 251, 0.2)";
+          console.log("✅ Switched to Deep Search Mode");
+        } else {
+          // Switch to Quick Search
+          mode = "Quick Search";
+          toggleSlider.style.transform = "translateX(0%)";
+          // toggleSlider.style.background = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)";
+          deepOption.classList.remove("active");
+          quickOption.classList.add("active");
+          modeDescription.innerHTML = "<strong>Quick Search:</strong> Generates a report with essential business intelligence";
+          // modeDescription.style.background = "rgba(255, 255, 255, 0.7)";
+          console.log("✅ Switched to Quick Search Mode");
+        }
+        
+        searchModeInput.value = mode;
+        console.log("🔄 Current Mode:", mode);
+      });
+
+      // Handle form submission
+      form.addEventListener("submit", function (e) {
+        // Ensure mode is set correctly before submission
+        searchModeInput.value = mode;
+        
+        // Show status message
+        statusMessage.style.display = "block";
+        
+        if (mode === "Deep Search") {
+          statusMessage.textContent = "Generating Deep Search Report... Please wait.";
+          // statusMessage.style.background = "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)";
+        } else {
+          statusMessage.textContent = "Generating Quick Search Report... Please wait.";
+          // statusMessage.style.background = "#3498db";
+        }
+
+        // Disable controls during generation
+        researchBtn.disabled = true;
+        researchBtn.textContent = "Generating...";
+        searchToggle.style.pointerEvents = "none";
+        searchToggle.style.opacity = "0.5";
+        
+        console.log("🚀 Submitting form with mode:", mode);
+      });
+
+      // Visual feedback on hover
+      searchToggle.addEventListener("mouseenter", function() {
+        this.style.transform = "scale(1.02)";
+      });
+
+      searchToggle.addEventListener("mouseleave", function() {
+        this.style.transform = "scale(1)";
+      });
+    });
+  </script> -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const hamburgerBtn = document.getElementById("hamburgerBtn");
+      const menu = document.getElementById("menu");
+
+      const toggleSlider = document.getElementById("toggleSlider");
+      const quickOption = document.getElementById("quickOption");
+      const deepOption = document.getElementById("deepOption");
+      const searchModeInput = document.getElementById("searchModeInput");
+      const modeDescription = document.getElementById("modeDescription");
+      const researchBtn = document.getElementById("researchBtn");
+      const searchToggle = document.getElementById("searchToggle");
+      const form = document.getElementById("searchForm");
+      const statusMessage = document.getElementById("statusMessage");
+      const companyInput = document.querySelector('input[name="company"]');
+
+      let mode = "Quick Search";
+      let isSubmitting = false;
+      searchModeInput.value = mode;
+
+      // Check if this is a new research session
+      const urlParams = new URLSearchParams(window.location.search);
+      const isNewResearch = urlParams.get('new') === 'true';
+      
+      // Check if report exists
+      const reportExists = document.querySelector('.preview-box') !== null || document.getElementById('downloadBtn') !== null;
+      
+      // Disable controls if report exists and NOT a new research session
+      if (reportExists && !isNewResearch) {
+        disableAllControls();
+        console.log("🔒 Report exists - controls disabled");
+      } else if (isNewResearch) {
+        enableAllControls();
+        console.log("✅ New Research - controls enabled");
+      }
+
+      function disableAllControls() {
+        researchBtn.disabled = true;
+        researchBtn.textContent = "Report Generated";
+        researchBtn.style.cursor = "not-allowed";
+        researchBtn.style.opacity = "0.6";
+        researchBtn.style.pointerEvents = "none";
+        
+        searchToggle.style.pointerEvents = "none";
+        searchToggle.style.opacity = "0.5";
+        searchToggle.style.cursor = "not-allowed";
+        
+        companyInput.readOnly = true;
+        companyInput.style.cursor = "not-allowed";
+        companyInput.style.opacity = "0.6";
+        companyInput.style.backgroundColor = "#f5f5f5";
+        companyInput.style.pointerEvents = "none";
+        companyInput.placeholder = "Click 'New Research' to generate another report";
+        
+        isSubmitting = true;
+      }
+
+      function enableAllControls() {
+        researchBtn.disabled = false;
+        researchBtn.textContent = "Research";
+        researchBtn.style.cursor = "pointer";
+        researchBtn.style.opacity = "1";
+        researchBtn.style.pointerEvents = "auto";
+        
+        searchToggle.style.pointerEvents = "auto";
+        searchToggle.style.opacity = "1";
+        searchToggle.style.cursor = "pointer";
+        
+        companyInput.readOnly = false;
+        companyInput.style.cursor = "text";
+        companyInput.style.opacity = "1";
+        companyInput.style.backgroundColor = "";
+        companyInput.style.pointerEvents = "auto";
+        companyInput.placeholder = "Enter a company name (Ex. Apple, Microsoft, Tesla)...";
+        companyInput.value = "";
+        
+        isSubmitting = false;
+      }
+
+      // Hamburger menu toggle
+      hamburgerBtn.addEventListener("click", () => {
+        menu.classList.toggle("active");
+      });
+
+      // Toggle logic
+      searchToggle.addEventListener("click", function (e) {
+        e.preventDefault();
+        
+        if (isSubmitting) return;
+        
+        if (mode === "Quick Search") {
+          mode = "Deep Search";
+          toggleSlider.style.transform = "translateX(100%)";
+          quickOption.classList.remove("active");
+          deepOption.classList.add("active");
+          if (modeDescription) {
+            modeDescription.innerHTML = "<strong>Deep Search:</strong> Generates a comprehensive report with exhaustive analysis and citations";
+          }
+          console.log("✅ Switched to Deep Search Mode");
+        } else {
+          mode = "Quick Search";
+          toggleSlider.style.transform = "translateX(0%)";
+          deepOption.classList.remove("active");
+          quickOption.classList.add("active");
+          if (modeDescription) {
+            modeDescription.innerHTML = "<strong>Quick Search:</strong> Generates a report with essential business intelligence";
+          }
+          console.log("✅ Switched to Quick Search Mode");
+        }
+        
+        searchModeInput.value = mode;
+        console.log("🔄 Current Mode:", mode);
+      });
+
+      // Handle form submission
+      form.addEventListener("submit", function (e) {
+        if (!companyInput.value.trim()) {
+          return;
+        }
+
+        if (isSubmitting) {
+          e.preventDefault();
+          return;
+        }
+
+        isSubmitting = true;
+        searchModeInput.value = mode;
+        
+        statusMessage.style.display = "block";
+        
+        if (mode === "Deep Search") {
+          statusMessage.textContent = "⏳ Generating Deep Search Report... Please wait.";
+        } else {
+          statusMessage.textContent = "⏳ Generating Quick Search Report... Please wait.";
+        }
+
+        disableAllControls();
+        
+        console.log("🚀 Submitting form with mode:", mode);
+      });
+
+      // Visual feedback on hover
+      searchToggle.addEventListener("mouseenter", function() {
+        if (!isSubmitting && this.style.pointerEvents !== "none") {
+          this.style.transform = "scale(1.02)";
+        }
+      });
+
+      searchToggle.addEventListener("mouseleave", function() {
+        if (!isSubmitting && this.style.pointerEvents !== "none") {
+          this.style.transform = "scale(1)";
+        }
+      });
+    });
+</script>
+</body>
+</html>
